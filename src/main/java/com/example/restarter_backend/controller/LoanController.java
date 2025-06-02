@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -33,6 +34,18 @@ public class LoanController {
         return loanService.createLoan(loan);
     }
 
+    // PUT endpoint to update an existing loan.
+    @PostMapping("/{id}/renew")
+    public ResponseEntity<?> renewLoan(@PathVariable Long id) {
+        try {
+            Loan renewed = loanService.renewLoan(id);
+            return ResponseEntity.ok(renewed);
+        } catch (Exception ex) {
+            // Return JSON object with "message" field
+            return ResponseEntity.badRequest().body(Map.of("message", ex.getMessage()));
+        }
+}
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLoan(@PathVariable Long id) {
         loanService.deleteLoan(id);
@@ -40,7 +53,7 @@ public class LoanController {
     }
 
     @ExceptionHandler(LoanLimitExceededException.class)
-    public ResponseEntity<String> handleLoanLimit(LoanLimitExceededException ex) {
-        return ResponseEntity.badRequest().body(ex.getMessage());
+    public ResponseEntity<Map<String, String>> handleLoanLimit(LoanLimitExceededException ex) {
+        return ResponseEntity.badRequest().body(Map.of("message", ex.getMessage()));
     }
 }

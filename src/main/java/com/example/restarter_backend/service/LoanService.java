@@ -8,6 +8,7 @@ import com.example.restarter_backend.repository.LoanRepository;
 import com.example.restarter_backend.repository.UserRepository;
 import com.example.restarter_backend.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -38,6 +39,9 @@ public class LoanService {
         // Check if user exists
         User user = userRepository.findById(loan.getUser().getId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Update overdue loans for this user before checking
+        updateOverdueLoansForUser(user.getId());
 
         // Check for overdue books
         long overdueLoans = loanRepository.countByUserIdAndStatus(user.getId(), Loan.Status.OVERDUE);
@@ -119,5 +123,31 @@ public class LoanService {
 
     public void deleteLoan(Long id) {
         loanRepository.deleteById(id);
+    }
+
+    // Add this helper method:
+    private void updateOverdueLoansForUser(Long userId) {
+        List<Loan> loans = loanRepository.findByUserId(userId);
+        LocalDate today = LocalDate.now();
+        for (Loan loan : loans) {
+            if (loan.getStatus() == Loan.Status.ACTIVE && loan.getDueDate().isBefore(today)) {
+                System.out.println("Updating loan " + loan.getId() + " to OVERDUE");
+                loan.setStatus(Loan.Status.OVERDUE);
+                loanRepository.save(loan);
+            }
+        }
+    }
+
+    @Scheduled(cron = "0 0 1 * * ?") // Runs every day at 1:00 AM
+    public void updateAllOverdueLoans() {
+        List<Loan> loans = loanRepository.findAll();
+        LocalDate today = LocalDate.now();
+        for (Loan loan : loans) {
+            if (loan.getStatus() == Loan.Status.ACTIVE && loan.getDueDate().isBefore(today)) {
+                loan.setStatus(Loan.Status.OVERDUE);
+                loanRepository.save(loan);
+            }
+        }
+        System.out.println("Scheduled overdue loan update completed.");
     }
 }

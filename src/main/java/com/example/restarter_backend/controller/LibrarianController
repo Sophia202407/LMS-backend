@@ -1,0 +1,16 @@
+package com.example.restarter_backend.controller;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+@PreAuthorize("hasRole('LIBRARIAN')")
+@RestController
+@RequestMapping("/api/librarian")
+public class LibrarianController {
+
+    @PostMapping("/api/librarian/books")
+    public ResponseEntity<?> addBook(@RequestBody Book book) {
+        // Only librarians can add books
+        return "Book added!";
+    }
+}

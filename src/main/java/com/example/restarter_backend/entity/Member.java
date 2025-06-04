@@ -5,7 +5,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import java.time.LocalDate;
+
 /**
 * Represents a member in the library management system.
 * This entity maps to the 'member' table in the database.
@@ -21,7 +24,13 @@ private String name; // Full name of the member
 private String address; // Address of the member
 @Column(name = "contact_info", nullable = false)
 private String contactInfo; // Contact information (e.g., phone number or email)
-
+@Column(name = "username", nullable = false, unique = true)
+private String username; // Username for the member's account
+@Column(name = "password", nullable = false)
+private String password; // Password for the member's account
+@Enumerated(EnumType.STRING)
+@Column(name = "role", nullable = false)
+private Role role; // Role of the member (LIBRARIAN or MEMBER)
 @Column(name = "registration_date", nullable = false)
 private LocalDate registrationDate; // Date when the member registered
 @Column(name = "membership_expiry_date", nullable = false)
@@ -53,6 +62,24 @@ return contactInfo;
 }
 public void setContactInfo(String contactInfo) {
 this.contactInfo = contactInfo;
+}
+public String getUsername() {
+return username;
+}
+public void setUsername(String username) {
+this.username = username;
+}
+public String getPassword() {
+return password;
+}
+public void setPassword(String password) {
+this.password = password;
+}
+public Role getRole() {
+return role;
+}
+public void setRole(Role role) {
+this.role = role;
 }
 public LocalDate getRegistrationDate() {
 return registrationDate;

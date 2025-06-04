@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 /**
 * REST controller for managing member-related operations.
 * Exposes endpoints for CRUD operations and searching members.
@@ -32,9 +34,20 @@ found
 */
 @GetMapping("/{id}")
 public ResponseEntity<Member> getMemberById(@PathVariable Long id) {
-Optional<Member> member = memberService.getMemberById(id);
-return member.map(ResponseEntity::ok)
-.orElseGet(() -> ResponseEntity.notFound().build());
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    String currentUsername = auth.getName();
+
+    Optional<Member> member = memberService.getMemberById(id);
+    if (member.isPresent()) {
+        // Allow if librarian or if the member's username matches the authenticated user
+        if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_LIBRARIAN")) ||
+            member.get().getUsername().equals(currentUsername)) {
+            return ResponseEntity.ok(member.get());
+        } else {
+            return ResponseEntity.status(403).build();
+        }
+    }
+    return ResponseEntity.notFound().build();
 }
 /**
 * POST endpoint to add a new member.
@@ -52,9 +65,22 @@ return memberService.addMember(member);
 * @return The updated member
 */
 @PutMapping("/{id}")
-public Member updateMember(@PathVariable Long id, @RequestBody Member
-memberDetails) {
-return memberService.updateMember(id, memberDetails);
+public ResponseEntity<Member> updateMember(@PathVariable Long id, @RequestBody Member memberDetails) {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    String currentUsername = auth.getName();
+    boolean isLibrarian = auth.getAuthorities().stream()
+        .anyMatch(a -> a.getAuthority().equals("ROLE_LIBRARIAN"));
+
+    Optional<Member> member = memberService.getMemberById(id);
+    if (member.isPresent()) {
+        if (isLibrarian || member.get().getUsername().equals(currentUsername)) {
+            Member updated = memberService.updateMember(id, memberDetails, currentUsername, isLibrarian);
+            return ResponseEntity.ok(updated);
+        } else {
+            return ResponseEntity.status(403).build();
+        }
+    }
+    return ResponseEntity.notFound().build();
 }
 /**
 * DELETE endpoint to delete a member by their ID.
@@ -63,8 +89,21 @@ return memberService.updateMember(id, memberDetails);
 */
 @DeleteMapping("/{id}")
 public ResponseEntity<Void> deleteMember(@PathVariable Long id) {
-memberService.deleteMember(id);
-return ResponseEntity.noContent().build();
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    String currentUsername = auth.getName();
+    boolean isLibrarian = auth.getAuthorities().stream()
+        .anyMatch(a -> a.getAuthority().equals("ROLE_LIBRARIAN"));
+
+    Optional<Member> member = memberService.getMemberById(id);
+    if (member.isPresent()) {
+        if (isLibrarian || member.get().getUsername().equals(currentUsername)) {
+            memberService.deleteMember(id, currentUsername, isLibrarian);
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.status(403).build();
+        }
+    }
+    return ResponseEntity.notFound().build();
 }
 /**
 * GET endpoint to search members by name.

@@ -11,7 +11,10 @@ public class User {
 
     private String username;
     private String email;
-    private String password; // Store hashed passwords in production
+    private String password;
+
+    @Enumerated(EnumType.STRING)
+    private Role role; // Add this line
 
     // Getters and setters
     public Long getId() { return id; }
@@ -25,4 +28,7 @@ public class User {
 
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
+
+    public Role getRole() { return role; }
+    public void setRole(Role role) { this.role = role; }
 }

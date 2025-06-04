@@ -3,6 +3,7 @@ package com.example.restarter_backend.service;
 import com.example.restarter_backend.entity.Member;
 import java.util.List;
 import java.util.Optional;
+
 /**
 * Service interface for managing member-related operations.
 * Defines methods for CRUD operations and business logic for the Member 
@@ -11,37 +12,31 @@ entity.
 public interface MemberService {
 /**
 * Retrieves all members from the database.
-* @return List of all members
+* Only librarians should be able to use this.
 */
 List<Member> getAllMembers();
 /**
 * Retrieves a member by their ID.
-* @param id The ID of the member to find
-* @return Optional containing the member if found, empty otherwise
+* Only librarians or the member themselves should be able to use this.
 */
 Optional<Member> getMemberById(Long id);
 /**
 * Adds a new member to the database.
-* @param member The member to add
-* @return The saved member
 */
 Member addMember(Member member);
 /**
 * Updates an existing member in the database.
-* @param id The ID of the member to update
-* @param memberDetails The updated member details
-* @return The updated member
+* Only librarians or the member themselves should be able to use this.
 */
-Member updateMember(Long id, Member memberDetails);
+Member updateMember(Long id, Member memberDetails, String currentUsername, boolean isLibrarian);
 /**
 * Deletes a member from the database by their ID.
-* @param id The ID of the member to delete
+* Only librarians or the member themselves should be able to use this.
 */
-void deleteMember(Long id);
+void deleteMember(Long id, String currentUsername, boolean isLibrarian);
 /**
 * Searches for members by name.
-* @param name The name to search for (partial match)
-* @return List of members matching the name
+* Only librarians should be able to use this.
 */
 List<Member> searchMembersByName(String name);
 }

@@ -6,6 +6,7 @@ import com.example.restarter_backend.service.LoanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.Map;
@@ -21,7 +22,8 @@ public class LoanController {
     public List<Loan> getAllLoans() {
         return loanService.getAllLoans();
     }
-
+    
+    @PreAuthorize("hasAuthority('LIBRARIAN')")
     @GetMapping("/{id}")
     public ResponseEntity<Loan> getLoanById(@PathVariable Long id) {
         Optional<Loan> loan = loanService.getLoanById(id);
@@ -34,7 +36,8 @@ public class LoanController {
         return loanService.createLoan(loan);
     }
 
-    // PUT endpoint to update an existing loan.
+    // PUT endpoint to update an existing loan
+    @PreAuthorize("hasAuthority('LIBRARIAN')")
     @PostMapping("/{id}/renew")
     public ResponseEntity<?> renewLoan(@PathVariable Long id) {
         try {
@@ -46,6 +49,7 @@ public class LoanController {
         }
 }
 
+    @PreAuthorize("hasAuthority('LIBRARIAN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLoan(@PathVariable Long id) {
         loanService.deleteLoan(id);

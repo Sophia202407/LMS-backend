@@ -12,6 +12,8 @@ public class RestarterBackendApplication {
     public static void main(String[] args) {
         // Load the .env file
         Dotenv dotenv = Dotenv.configure().load();
+        System.out.println("DB_USERNAME=" + dotenv.get("DB_USERNAME")); // Debug
+        
         dotenv.entries().forEach(entry -> System.setProperty(entry.getKey(),
         entry.getValue()));
 

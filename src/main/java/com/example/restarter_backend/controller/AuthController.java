@@ -111,8 +111,17 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
-
+        // Current User Endpoint
+        // @GetMapping("/me")
+        // public ResponseEntity<?> currentUser(Authentication authentication) {
+        //     if (authentication != null && authentication.isAuthenticated() 
+        //         && !(authentication instanceof AnonymousAuthenticationToken)) {
+        //         return ResponseEntity.ok(authentication.getPrincipal());
+        //     }
+        //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        //         .body("No authenticated user.");
 }
+
 
 // Jun.6 use latest login version, which uses AuthenticationManager to perform the login, 
 // is absolutely necessary to correctly handle user authentication 

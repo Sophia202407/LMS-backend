@@ -21,7 +21,6 @@ public class LoanController {
     private LoanService loanService;
 
     // --- GET Endpoints ---
-
     // LIBRARIAN ONLY: Get all loans in the system
     @PreAuthorize("hasRole('LIBRARIAN')")
     @GetMapping("/all")
@@ -29,17 +28,7 @@ public class LoanController {
         return loanService.getAllLoans();
     }
 
-    // LIBRARIAN ONLY: Get a specific loan by ID
-    @PreAuthorize("hasRole('LIBRARIAN')")
-    @GetMapping("/{id}")
-    public ResponseEntity<Loan> getLoanById(@PathVariable Long id) {
-        Optional<Loan> loan = loanService.getLoanById(id);
-        return loan.map(ResponseEntity::ok)
-                   .orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
     // --- POST Endpoints ---
-
     // AUTHENTICATED USER: Create a new loan
     @PostMapping
     @PreAuthorize("isAuthenticated()") // Ensure only authenticated users can create loans
@@ -64,7 +53,6 @@ public class LoanController {
     }
 
     // --- DELETE Endpoint ---
-
     // LIBRARIAN ONLY: Delete a loan
     @PreAuthorize("hasRole('LIBRARIAN')")
     @DeleteMapping("/{id}")
@@ -74,7 +62,6 @@ public class LoanController {
     }
 
     // --- Centralized Exception Handlers ---
-
     // Handles LoanLimitExceededException specifically
     @ExceptionHandler(LoanLimitExceededException.class)
     public ResponseEntity<Map<String, String>> handleLoanLimit(LoanLimitExceededException ex) {

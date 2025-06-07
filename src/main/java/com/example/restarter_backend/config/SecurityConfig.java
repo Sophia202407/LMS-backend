@@ -1,10 +1,8 @@
 package com.example.restarter_backend.config;
 
-// Removed direct import for UserService from here, as it's not directly injected into SecurityConfig's fields/constructor
-// import com.example.restarter_backend.service.UserService;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod; 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -17,13 +15,14 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.security.core.userdetails.UserDetailsService; // Import UserDetailsService
+import org.springframework.security.core.userdetails.UserDetailsService; 
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity // Enable method-level security for @PreAuthorize
 public class SecurityConfig {
 
     // Removed: private final UserService userService;
@@ -39,12 +38,31 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Configure CORS
             .authorizeHttpRequests(authorize -> authorize
                 // Allow registration and login without authentication
-                .requestMatchers("/api/auth/**").permitAll() 
+                .requestMatchers(
+                    "/api/auth/**",
+                    "/api/auth/register", 
+                    "/api/auth/login", 
+                    "/api/auth/logout", 
+                    "/api/books",
+                    "/api/books/status",
+                    "/api/books/search"
+                ).permitAll()
                 // All other requests require authentication
                 .anyRequest().authenticated()
             )
+            // Configure form login for session-based authentication
+            .formLogin(form -> form.disable())
+
+            // Configure logout for session invalidation
+            .logout(logout -> logout
+                .logoutUrl("/api/logout") // The URL to trigger logout from frontend
+                .invalidateHttpSession(true) // Invalidate the server-side session
+                .deleteCookies("JSESSIONID") // Delete the session cookie from the client
+                .permitAll() // Allow anyone to perform logout
+            )
+
             .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Use stateless sessions (e.g., for JWTs)
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // <-- IMPORTANT CHANGE: For session-based auth
             );
         return http.build();
     }
@@ -88,3 +106,6 @@ public class SecurityConfig {
 
 //Jun.6 confirmed all your CORS requirements are met in SecurityConfig
 // you can safely remove the separate CORS configuration file.
+
+//Jun.7 key changes:
+// update the authorization set on books, loans, logout and loginform

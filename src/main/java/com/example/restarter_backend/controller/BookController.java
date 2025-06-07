@@ -30,19 +30,20 @@ public class BookController {
     }
 
     // Accessible only by LIBRARIAN
-    @PreAuthorize("hasAuthority('LIBRARIAN')")
+    @PreAuthorize("hasRole('LIBRARIAN')")
     @PostMapping("/add")
     public Book addBook(@RequestBody Book book) {
         return bookService.addBook(book);
     }
 
+    @PreAuthorize("hasRole('LIBRARIAN')")
     @PutMapping("/{id}")
     public Book updateBook(@PathVariable Long id, @RequestBody Book bookDetails) {
         return bookService.updateBook(id, bookDetails);
     }
 
     // Accessible only by LIBRARIAN
-    @PreAuthorize("hasAuthority('LIBRARIAN')")
+    @PreAuthorize("hasRole('LIBRARIAN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
         bookService.deleteBook(id);

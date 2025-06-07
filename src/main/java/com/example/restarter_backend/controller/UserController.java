@@ -25,27 +25,27 @@ public class UserController {
     }
 
     // ==== Librarian-Only Endpoints ====
-    @PreAuthorize("hasAuthority('LIBRARIAN')")
+    @PreAuthorize("hasRole('LIBRARIAN')")
     @GetMapping
     public List<User> getAllUsers() {
         return userService.getAllUsers();
     }
 
-    @PreAuthorize("hasAuthority('LIBRARIAN')")
+    @PreAuthorize("hasRole('LIBRARIAN')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public User createUser(@RequestBody RegisterRequest request) {
         return userService.createUser(request);
     }
 
-    @PreAuthorize("hasAuthority('LIBRARIAN')")
+    @PreAuthorize("hasRole('LIBRARIAN')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
     }
 
-    @PreAuthorize("hasAuthority('LIBRARIAN')")
+    @PreAuthorize("hasRole('LIBRARIAN')")
     @GetMapping("/search")
     public List<User> searchUsersByName(@RequestParam String name) {
         return userService.searchUsersByName(name);
@@ -53,14 +53,14 @@ public class UserController {
 
     // ==== Shared Endpoints (Librarian or Owner) ====
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('LIBRARIAN') or @userController.isOwner(#id, principal)")
+    @PreAuthorize("hasRole('LIBRARIAN') or @userController.isOwner(#id, principal)")
     public User getUserById(@PathVariable Long id) {
         return userService.getUserById(id)
                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('LIBRARIAN') or @userController.isOwner(#id, principal)")
+    @PreAuthorize("hasRole('LIBRARIAN') or @userController.isOwner(#id, principal)")
     public User updateUser(@PathVariable Long id, @RequestBody User userDetails) {
         return userService.updateUser(id, userDetails);
     }

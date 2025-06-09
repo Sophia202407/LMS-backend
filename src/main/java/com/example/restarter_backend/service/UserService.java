@@ -90,9 +90,11 @@ public class UserService implements UserDetailsService {
         User existing = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (updates.getName() != null) existing.setName(updates.getName());
-        if (updates.getAddress() != null) existing.setAddress(updates.getAddress());
-        if (updates.getContactInfo() != null) existing.setContactInfo(updates.getContactInfo());
+        existing.setUsername(updates.getUsername());
+        existing.setEmail(updates.getEmail());
+        existing.setName(updates.getName()); // This will now correctly save empty string or new name
+        existing.setContactInfo(updates.getContactInfo()); // This will also correctly save empty string or new contact
+        existing.setRole(updates.getRole()); // Ensure the role is also updated
 
         return userRepository.save(existing);
     }

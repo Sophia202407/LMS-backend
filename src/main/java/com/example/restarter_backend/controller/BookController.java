@@ -4,6 +4,7 @@ import com.example.restarter_backend.entity.Book;
 import com.example.restarter_backend.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -55,8 +56,17 @@ public class BookController {
         return bookService.searchBooks(keyword);
     }
 
-    @GetMapping("/status")
-    public List<Book> filterByStatus(@RequestParam String status) {
-        return bookService.filterByStatus(status);
+    public ResponseEntity<List<Book>> getBooksByStatus(@RequestParam String status) {
+            try {
+                // Convert the string status parameter to the Book.Status enum
+                // Using toUpperCase() to make the conversion case-insensitive (e.g., "available" -> AVAILABLE)
+                Book.Status bookStatus = Book.Status.valueOf(status.toUpperCase());
+                List<Book> books = bookService.getAvailableBooks(bookStatus); // Call the service method
+                return ResponseEntity.ok(books);
+            } catch (IllegalArgumentException e) {
+                // Handle cases where the provided 'status' string doesn't match any enum constant
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                    .body(null); // Or return a more informative error message
+            }
+        }
     }
-}

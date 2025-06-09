@@ -47,7 +47,7 @@ public class BookService {
         );
     }
 
-    public List<Book> filterByStatus(String status) {
-        return bookRepository.findByStatus(status);
-    }
+    public List<Book> getAvailableBooks(Book.Status status) {
+    return bookRepository.findByStatus(status); 
+}
 }

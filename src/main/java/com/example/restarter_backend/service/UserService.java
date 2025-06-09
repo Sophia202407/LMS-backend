@@ -104,10 +104,10 @@ public class UserService implements UserDetailsService {
         userRepository.deleteById(id);
     }
 
-    public List<User> searchUsersByName(String name) {
+    public List<User> searchUsersByUsername(String name) {
         return userRepository.findAll().stream()
-                .filter(user -> user.getName() != null &&
-                             user.getName().toLowerCase().contains(name.toLowerCase()))
+                .filter(user -> user.getUsername() != null &&
+                             user.getUsername().toLowerCase().contains(name.toLowerCase()))
                 .toList();
     }
 }

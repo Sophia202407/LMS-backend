@@ -50,8 +50,8 @@ public class UserController {
 
     @PreAuthorize("hasRole('LIBRARIAN')")
     @GetMapping("/search")
-    public List<User> searchUsersByName(@RequestParam String name) {
-        return userService.searchUsersByName(name);
+    public List<User> searchUsersByUsername(@RequestParam String username) {
+        return userService.searchUsersByUsername(username);
     }
 
     // ==== Shared Endpoints (Librarian or Owner) ====
